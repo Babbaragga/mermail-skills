@@ -1,7 +1,7 @@
 interface:
   display_name: "Mermail xStocks Desk"
   short_description: "Search and preview one controlled Solana xStocks purchase"
-  default_prompt: "Use $mermail-xstocks-desk to search the evidence-backed catalog, let me select one product, create an exact short-lived USDC purchase preview, and wait for my explicit approval. Do not use DCA or a generic swap fallback."
+  default_prompt: "Use $mermail-xstocks-desk to resolve one evidence-backed product, prepare a USDC purchase with my eligible Solana wallet, and give me one Mermail Agent Wallet review link. Submit only after that browser page records my approval, then use the status tool to reconcile the same purchase."
 dependencies:
   tools:
     - type: "mcp"

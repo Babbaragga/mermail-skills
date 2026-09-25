@@ -104,7 +104,8 @@
     "mermail-xstocks-desk": [
       "xstocks_search_products",
       "xstocks_preview_buy",
-      "xstocks_submit_buy"
+      "xstocks_submit_buy",
+      "xstocks_get_buy_status"
     ],
     "mermail-agent-wallet": [
       "get_paybox_connection",

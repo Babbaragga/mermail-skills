@@ -1285,6 +1285,7 @@ const personaSkills = [
       "`xstocks_search_products`",
       "`xstocks_preview_buy`",
       "`xstocks_submit_buy`",
+      "`xstocks_get_buy_status`",
       "explicit approval",
       "not a broker",
       "Do not use this skill for DCA",
@@ -1408,7 +1409,8 @@ const xstocksPendingScenario = scenarios.find(
 );
 if (
   !xstocksPendingScenario ||
-  xstocksPendingScenario.tools.some((tool) => ["paybox_request_swap", "paybox_use_plugin", "xstocks_preview_buy"].includes(tool))
+  !xstocksPendingScenario.tools.includes("xstocks_get_buy_status") ||
+  xstocksPendingScenario.tools.some((tool) => ["paybox_request_swap", "paybox_use_plugin", "xstocks_preview_buy", "xstocks_submit_buy"].includes(tool))
 ) {
   errors.push("mermail-xstocks-desk: pending buy must reconcile the same preview without replacement");
 }
@@ -1979,8 +1981,8 @@ const walletScopedTools = Object.values(walletScopedDomains).flat();
 const knownTools = [...allTools, ...walletScopedTools];
 const duplicates = knownTools.filter((tool, index) => knownTools.indexOf(tool) !== index);
 if (allTools.length !== 73) errors.push(`expected 73 business tools, found ${allTools.length}`);
-if (walletScopedTools.length !== 22) {
-  errors.push(`expected 22 wallet-scoped tool canaries, found ${walletScopedTools.length}`);
+if (walletScopedTools.length !== 23) {
+  errors.push(`expected 23 wallet-scoped tool canaries, found ${walletScopedTools.length}`);
 }
 if (compatibility.catalog?.skills !== skillNames.length) {
   errors.push(`compatibility skill count must be ${skillNames.length}`);

@@ -8,17 +8,16 @@
 
 ## Exact preview
 
-1. Resolve an active Solana wallet credential through Mermail Agent Wallet reads.
-2. Call `xstocks_preview_buy` for the selected catalog product and amount.
+1. Call `xstocks_preview_buy` for the selected catalog product and amount, omitting a wallet unless the user already selected one.
 3. Stop on every blocked or unknown result. Do not switch provider, mint, network, or tool.
-4. Display all returned terms and the expiry. Label `simulated: true` as local testing with no asset movement.
-5. Treat the returned approval token as bound to that preview. Do not log it, email it, or reuse it for another preview.
+4. Present one `reviewUrl` as **Open Mermail Agent Wallet**. Label `simulated: true` as local testing with no asset movement.
+5. The purchase session lasts up to 15 minutes. Its browser page may refresh a 30-second quote while preserving product, amount, and wallet.
 
 ## Approval and submission
 
-1. Require an authenticated user message approving the exact preview while it is valid.
-2. Create one stable idempotency key for that approval and call `xstocks_submit_buy` once.
-3. Do not retry a timeout as a new purchase. Reuse the same preview ID and idempotency key only for reconciliation.
+1. Require approval recorded by the authenticated Mermail Agent Wallet browser page for the current quote terms.
+2. Call `xstocks_submit_buy` once with only the preview ID; the server owns approval and idempotency state.
+3. Do not retry a timeout as a new purchase. Use `xstocks_get_buy_status` with the same preview ID for one reconciliation when the user asks.
 4. Report pending/unknown separately. Report `confirmed` only after authoritative terminal confirmation; `confirmed_simulation` is local test evidence only.
 
 ## Unsupported flows
