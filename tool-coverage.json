@@ -11,8 +11,7 @@
     "mermail-research-agent",
     "mermail-scheduling-agent",
     "mermail-support-agent",
-    "mermail-x402-agent",
-    "mermail-xstocks-desk"
+    "mermail-x402-agent"
   ],
   "domains": {
     "mermail-administer-workspace": [
@@ -102,6 +101,11 @@
     ]
   },
   "walletScopedDomains": {
+    "mermail-xstocks-desk": [
+      "xstocks_search_products",
+      "xstocks_preview_buy",
+      "xstocks_submit_buy"
+    ],
     "mermail-agent-wallet": [
       "get_paybox_connection",
       "get_agent_wallet",
@@ -142,7 +146,8 @@
     "paybox_request_transfer",
     "paybox_request_swap",
     "paybox_pay_x402",
-    "paybox_use_plugin"
+    "paybox_use_plugin",
+    "xstocks_submit_buy"
   ],
   "externalEffectTools": [
     "invite_workspace_member",

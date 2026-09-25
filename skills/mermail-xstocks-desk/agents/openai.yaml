@@ -1,7 +1,7 @@
 interface:
   display_name: "Mermail xStocks Desk"
-  short_description: "DCA xStocks on Solana and email per-DCA invoices plus weekly statements"
-  default_prompt: "Use $mermail-xstocks-desk to run my standing xStocks grant with PayBox Jupiter plugin DCA, PayBox swap fallback, a per-DCA invoice email after each confirmed buy, and weekly brokerage-style statement email under my exact authorization."
+  short_description: "Search and preview one controlled Solana xStocks purchase"
+  default_prompt: "Use $mermail-xstocks-desk to search the evidence-backed catalog, let me select one product, create an exact short-lived USDC purchase preview, and wait for my explicit approval. Do not use DCA or a generic swap fallback."
 dependencies:
   tools:
     - type: "mcp"
