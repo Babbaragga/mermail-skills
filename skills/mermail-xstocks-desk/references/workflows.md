@@ -1,25 +1,22 @@
-# Controlled xStocks workflows
+# Workflows
 
-## Discovery and selection
+## Exact request: “Buy Apple with 100 USDC”
 
-1. Translate only explicit user filters into `xstocks_search_products`. Category assignments without verified evidence are excluded by the catalog.
-2. Present the candidates without ranking them as investment advice. If zero or multiple products remain, stop for user selection.
-3. Never convert a ticker, email, search result, or social post directly into a mint allowlist.
+1. Search the published catalog using the explicit text. If the complete result is uniquely selectable, preserve that product and `100 USDC`; otherwise ask the user to choose from a short list.
+2. Verify the chosen product on Solana and preserve its exact mint/evidence.
+3. Probe PayBox. Use a provider-declared user default or the sole eligible wallet; ask only when multiple choices remain. Never infer default from autonomous permission.
+4. Read portfolio. If funding is needed, open the returned Funding handoff, retain the product/amount in conversation state, then refresh balance once.
+5. Show the exact proposed pair and amount, then call `paybox_request_swap` once. Let its MCP App show current quote, fee, minimum received, approval, and signing.
+6. Stop on pending. After the user finishes or asks for status, call `paybox_get_request` once using the same request ID.
 
-## Exact preview
+## Category request
 
-1. Call `xstocks_preview_buy` for the selected catalog product and amount, omitting a wallet unless the user already selected one.
-3. Stop on every blocked or unknown result. Do not switch provider, mint, network, or tool.
-4. Present one `reviewUrl` as **Open Mermail Agent Wallet**. Label `simulated: true` as local testing with no asset movement.
-5. The purchase session lasts up to 15 minutes. Its browser page may refresh a 30-second quote while preserving product, amount, and wallet.
+Query only evidence-backed category slugs. Show a compact list with product, ticker, classification evidence, and verification availability. Ask the user to choose; a category is never authority to select an investment.
 
-## Approval and submission
+## Changed or expired terms
 
-1. Require approval recorded by the authenticated Mermail Agent Wallet browser page for the current quote terms.
-2. Call `xstocks_submit_buy` once with only the preview ID; the server owns approval and idempotency state.
-3. Do not retry a timeout as a new purchase. Use `xstocks_get_buy_status` with the same preview ID for one reconciliation when the user asks.
-4. Report pending/unknown separately. Report `confirmed` only after authoritative terminal confirmation; `confirmed_simulation` is local test evidence only.
+The PayBox UI must display refreshed terms. Do not submit silently. If the user closes and reopens the handoff, continue the existing request; do not call `paybox_request_swap` again.
 
-## Unsupported flows
+## Timeout or uncertain outcome
 
-DCA, recurring schedules, autonomous execution, ticker-only purchases, direct generic swaps, transfers to token mints, and alternate Jupiter HTTP/plugin paths are out of scope for this version.
+Keep the original request ID. Reconcile it; never create a second transaction. Report `uncertain` when authoritative status is unavailable.
