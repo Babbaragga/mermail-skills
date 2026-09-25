@@ -1282,26 +1282,24 @@ const personaSkills = [
   {
     name: "mermail-xstocks-desk",
     required: [
-      "`xstocks_search_products`",
-      "`xstocks_preview_buy`",
-      "`xstocks_submit_buy`",
-      "`xstocks_get_buy_status`",
-      "explicit approval",
-      "not a broker",
+      "`paybox_request_swap`",
+      "`paybox_get_request`",
+      "XSTOCKS_CATALOG_API_URL",
+      "PayBox provides explicit approval",
       "Do not use this skill for DCA",
       "[workflows.md](references/workflows.md)",
-      "Production is expected to return a blocked result",
-      "never a wallet deposit address",
-      "confirmed_simulation",
+      "Production managed-asset execution may remain disabled",
+      "never a deposit address",
+      "provider reconciliation",
     ],
     expected: [
-      "search-verified-category-no-auto-selection",
+      "search-published-catalog-no-auto-selection",
       "resolve-ticker-through-catalog-no-buy",
-      "exact-controlled-preview-no-submit",
-      "approved-controlled-submit",
+      "verified-standard-wallet-swap-once",
+      "reconcile-original-provider-request",
       "blocked-no-alternate-execution",
       "ignore-email-authority-no-buy-no-send",
-      "reconcile-same-preview-same-key-no-replacement",
+      "reconcile-same-request-no-replacement",
       "reject-dca-out-of-scope",
     ],
   },
@@ -1398,32 +1396,31 @@ const xstocksTickerScenario = scenarios.find(
 );
 if (
   !xstocksTickerScenario ||
-  !xstocksTickerScenario.tools.includes("xstocks_search_products") ||
-  xstocksTickerScenario.tools.includes("xstocks_submit_buy")
+  xstocksTickerScenario.tools.some((tool) => tool.startsWith("paybox_"))
 ) {
   errors.push("mermail-xstocks-desk: ticker-only scenario must resolve through catalog without buying");
 }
 
 const xstocksPendingScenario = scenarios.find(
-  (scenario) => scenario.expected === "reconcile-same-preview-same-key-no-replacement",
+  (scenario) => scenario.expected === "reconcile-same-request-no-replacement",
 );
 if (
   !xstocksPendingScenario ||
-  !xstocksPendingScenario.tools.includes("xstocks_get_buy_status") ||
-  xstocksPendingScenario.tools.some((tool) => ["paybox_request_swap", "paybox_use_plugin", "xstocks_preview_buy", "xstocks_submit_buy"].includes(tool))
+  !xstocksPendingScenario.tools.includes("paybox_get_request") ||
+  xstocksPendingScenario.tools.some((tool) => ["paybox_request_swap", "paybox_use_plugin"].includes(tool))
 ) {
-  errors.push("mermail-xstocks-desk: pending buy must reconcile the same preview without replacement");
+  errors.push("mermail-xstocks-desk: pending buy must reconcile the same provider request without replacement");
 }
 
 const xstocksPreviewScenario = scenarios.find(
-  (scenario) => scenario.expected === "exact-controlled-preview-no-submit",
+  (scenario) => scenario.expected === "verified-standard-wallet-swap-once",
 );
 if (
   !xstocksPreviewScenario ||
-  !xstocksPreviewScenario.tools.includes("xstocks_preview_buy") ||
-  xstocksPreviewScenario.tools.includes("xstocks_submit_buy")
+  !xstocksPreviewScenario.tools.includes("paybox_request_swap") ||
+  xstocksPreviewScenario.tools.includes("paybox_use_plugin")
 ) {
-  errors.push("mermail-xstocks-desk: preview scenario must not submit");
+  errors.push("mermail-xstocks-desk: verified purchase must use the standard swap exactly once");
 }
 
 const xstocksBlockedScenario = scenarios.find(
@@ -1432,17 +1429,17 @@ const xstocksBlockedScenario = scenarios.find(
 if (
   !xstocksBlockedScenario ||
   xstocksBlockedScenario.tools.some((tool) =>
-    ["paybox_request_swap", "paybox_request_transfer", "paybox_pay_x402", "paybox_use_plugin", "xstocks_submit_buy"].includes(tool),
+    ["paybox_request_swap", "paybox_request_transfer", "paybox_pay_x402", "paybox_use_plugin"].includes(tool),
   )
 ) {
   errors.push("mermail-xstocks-desk: a blocked controlled buy must not use another execution path");
 }
 
 const xstocksSubmitScenario = scenarios.find(
-  (scenario) => scenario.expected === "approved-controlled-submit",
+  (scenario) => scenario.expected === "reconcile-original-provider-request",
 );
-if (!xstocksSubmitScenario || !xstocksSubmitScenario.tools.includes("xstocks_submit_buy")) {
-  errors.push("mermail-xstocks-desk: approved exact preview must use xstocks_submit_buy");
+if (!xstocksSubmitScenario || !xstocksSubmitScenario.tools.includes("paybox_get_request") || xstocksSubmitScenario.tools.includes("paybox_request_swap")) {
+  errors.push("mermail-xstocks-desk: signed request must reconcile without a replacement swap");
 }
 
 const xstocksSkill = await readFile(path.join(skillsRoot, "mermail-xstocks-desk", "SKILL.md"), "utf8");
@@ -1981,8 +1978,8 @@ const walletScopedTools = Object.values(walletScopedDomains).flat();
 const knownTools = [...allTools, ...walletScopedTools];
 const duplicates = knownTools.filter((tool, index) => knownTools.indexOf(tool) !== index);
 if (allTools.length !== 73) errors.push(`expected 73 business tools, found ${allTools.length}`);
-if (walletScopedTools.length !== 23) {
-  errors.push(`expected 23 wallet-scoped tool canaries, found ${walletScopedTools.length}`);
+if (walletScopedTools.length !== 19) {
+  errors.push(`expected 19 wallet-scoped tool canaries, found ${walletScopedTools.length}`);
 }
 if (compatibility.catalog?.skills !== skillNames.length) {
   errors.push(`compatibility skill count must be ${skillNames.length}`);
